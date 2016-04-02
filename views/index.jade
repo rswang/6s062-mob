@@ -1,8 +1,10 @@
 extends layout
-
+block head
+  script(src='https://cdn.socket.io/socket.io-1.4.5.js')
+  script(src='/javascripts/socketUtil.js')
 block content
   h1= title
   p Welcome to #{title}
-  ul
-  each entry in entries
-    li= entry
+  ul#entries-container
+    each entry in entries
+      li= entry.data

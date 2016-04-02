@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Entry = require('../models/Entry');
+var io = require('../io');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -13,12 +14,14 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    var data = req.body;
+    var data = req.body.message;
     Entry.create({data: data}, function(err, newEntry) {
         if (err) {
             res.status(500).send(err);
-        }
-        res.status(200).send("Success");
+        } else {
+					io.emit("message", data);
+        	res.status(200).send("Success");
+				}
     })
 });
 
