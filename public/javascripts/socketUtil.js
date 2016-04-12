@@ -9,3 +9,6 @@ socket.on('message', function(data) {
 	var message = $('<li>' + data + '</li>');
 	$('#entries-container').append(message);
 });
+socket.on('roomsensorupdate', function(sensor) {
+  console.log(sensor);
+});

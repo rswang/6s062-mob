@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 
-var entrySchema = mongoose.Schema({
+var EntrySchema = mongoose.Schema({
     data: {type: String},
     date: {type: Date, default: new Date()}
 });
 
-var Entry = mongoose.model('Entry', entrySchema);
+var Entry = mongoose.model('Entry', EntrySchema);
 
 module.exports = Entry;
