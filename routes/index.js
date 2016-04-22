@@ -10,26 +10,20 @@ router.get('/', function(req, res, next) {
     if (err) {
       res.status(500).send(err);
     }
-		res.render('sensors', {sensors: sensors});
+    res.render('sensors', {sensors: sensors});
   })
 });
 
 router.post('/', function(req, res, next) {
   var data = req.body.message;
-  Entry.create({data: data}, function(err, newEntry) {
+  RoomSensor.registerValue(data, function(err, sensor) {
     if (err) {
       res.status(500).send(err);
     } else {
-      RoomSensor.updateStatus(data, function(err, sensor) {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-			    io.emit("message", data);
-          io.emit("roomsensorupdate", sensor);
-    	    res.status(200).send("Success");
-        }
-      });
-	  }
+      io.emit("message", data);
+      io.emit("roomsensorupdate", sensor);
+    res.status(200).send("Success");
+    }
   });
 });
 

@@ -5,12 +5,12 @@
  * Sets up the basic handshake upon socket connection between
  * frontend and server.
  */
-const io = require('socket.io')();
+var io = require('socket.io')();
 
-io.on('connection', (socket) => {
+io.on('connection', function(socket) {
 	console.log('connection!');
 	socket.emit('connection', { message: 'connected!' });
-	socket.on('ack', (data) => console.log(data))
+	socket.on('ack', function(data) {console.log(data)})
 });
 
 module.exports = io;
