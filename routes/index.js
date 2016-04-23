@@ -34,7 +34,7 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/readings', function(req, res) {
-  SensorValue.find({}).sort({date: -1}).exec(function(err, sensorValues) {
+  SensorValue.find({}).sort({date: -1}).limit(50).exec(function(err, sensorValues) {
     if (err) {
       res.status(500).send(err);
     }
@@ -43,7 +43,11 @@ router.get('/readings', function(req, res) {
 })
 
 router.get('/logs', function(req, res) {
-  Entry.find({}).sort({date: 1}).exec(function(err, entries) {
+  Entry.aggregate([
+    {$sort: {date: -1}},
+    {$limit: 20},
+    {$sort: {date: 1}}
+  ]).exec(function(err, entries) {
     if (err) {
       res.status(500).send(err);
     }
