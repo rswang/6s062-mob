@@ -11,6 +11,7 @@ var db = mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL || 'mongodb://loc
 var routes = require('./routes/index');
 
 var app = express();
+app.locals.moment = require('moment');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

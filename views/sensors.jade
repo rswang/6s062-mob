@@ -3,7 +3,20 @@ block head
   script(src='https://cdn.socket.io/socket.io-1.4.5.js')
   script(src='/javascripts/socketUtil.js')
 block content
-  h1= title
-  ul#sensors-container
-    each sensor in sensors
-      li= sensor
+  include ./nav.jade
+  .container
+    h1= title
+    ul.collection#sensors-container
+      each sensor in sensors
+        li.collection-item.avatar
+          if moment().subtract(5, 'minutes').isAfter(sensor.lastMotionTime)
+            i.material-icons.circle.green location_off
+          else
+            i.material-icons.circle.red location_on
+          span.title #{sensor.sensorID}
+          p
+            | <i>Last seen #{moment(sensor.lastMotionTime).fromNow()}</i>
+            br
+            | <b>Temperature:</b> #{sensor.temperature}°F
+            br
+            | <b>Humidity:</b> #{sensor.humidity}%

@@ -50,7 +50,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
             return;
           }
           RoomSensor.updateStatus(doc, data.substring(16), entry, callback);
-				});
+		});
       } else {
         RoomSensor.updateStatus(roomSensors[0], data.substring(16), entry, callback);
       }
@@ -58,7 +58,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
   });
 }
 
-RoomSensorSchema.statics.updateStatus = function updateStatus (sensor, data, entry, callback) {
+RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) {
   var value1 = data.substring(0,8);
   var value2 = data.substring(8,16);
   async.map([value1, value2], function(value, done) {
@@ -86,13 +86,21 @@ RoomSensorSchema.statics.updateStatus = function updateStatus (sensor, data, ent
           sensor.lastMotionTime = sensorValue.date;
         } else if (sensorValue.type == "T") {
           sensor.temperature = sensorValue.value;
-        } else {
+        } else if (sensorValue.type == "H") {
           sensor.humidity = sensorValue.value;
+        } else {
+            callback({
+                message: "Invalid sensor type",
+            });
         }
       }
     });
     sensor.save();
-    callback(null, sensor);
+    callback(null, {
+        sensor: sensor,
+        sensorValues: sensorValues,
+        entry: entry,
+    });
   });
 };
 

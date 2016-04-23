@@ -1,0 +1,33 @@
+extends layout
+block head
+  script(src='https://cdn.socket.io/socket.io-1.4.5.js')
+  script(src='/javascripts/socketUtil.js')
+block content
+  include ./nav.jade
+  .container
+    h1= title
+    p Welcome to #{title}
+    ul.collection#readings-container
+      each sensorValue in sensorValues
+        li.collection-item.avatar
+          if sensorValue.type == "M"
+            i.material-icons.circle.orange check
+            span.title #{sensorValue.sensorID}
+            p
+              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              br
+              | Motion detected
+          else if sensorValue.type == "T"            
+            i.material-icons.circle.blue check
+            span.title #{sensorValue.sensorID}
+            p
+              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              br
+              | <b>Temperature:</b> #{sensorValue.value}°F
+          else if sensorValue.type == "H"
+            i.material-icons.circle.purple check
+            span.title #{sensorValue.sensorID}
+            p
+              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              br
+              | <b>Humidity:</b> #{sensorValue.value}%
