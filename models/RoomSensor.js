@@ -73,7 +73,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
       sensorID: sensor.sensorID,
       type: type,
       value: parseFloat(reading),
-      date: sensor.date,
+      date: entry.date,
     }, done);
   }, function(err, sensorValues) {
     if (err) {
