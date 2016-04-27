@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var SensorValue = require('./SensorValue');
 var Entry = require('./Entry');
 var async = require('async');
+var _ = require('lodash');
 
 var RoomSensorSchema = mongoose.Schema({
   sensorID: {type: String},
@@ -68,7 +69,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
       return;
     }
     var reading = value.substring(1, 8);
-
+    console.log("creating sensor with type " + type);
     SensorValue.create({
       sensorID: sensor.sensorID,
       type: type,
@@ -80,6 +81,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
       callback(err);
       return;
     }
+    sensorValues = _.compact(sensorValues);
     sensorValues.forEach(function(sensorValue) {
       if (sensorValue != null) {
         if (sensorValue.type == "M") {

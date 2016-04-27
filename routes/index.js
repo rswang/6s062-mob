@@ -24,6 +24,7 @@ router.post('/', function(req, res, next) {
       res.status(500).send(err);
     } else {
       results.sensorValues.forEach(function(sensorValue) {
+        console.log(sensorValue);
         io.emit("reading", sensorValue);
       });
       io.emit("message", results.entry);
@@ -52,6 +53,15 @@ router.get('/logs', function(req, res) {
       res.status(500).send(err);
     }
     res.render('logs', {title: '6.S062 Sensor Logs', entries: entries});
+  })
+})
+
+router.get('/graph', function(req, res) {
+    SensorValue.find({}).sort({date: 1}).exec(function(err, sensorValues) {
+    if (err) {
+      res.status(500).send(err);
+    }
+    res.render('graph', {title: '6.S062 Sensor Logs', readings: sensorValues});
   })
 })
 

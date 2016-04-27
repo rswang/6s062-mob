@@ -17,16 +17,20 @@ socket.on('reading', function(sensorValue) {
     switch (sensorValue.type) {
       case "M":
         template = "log-motion";
+        humidityGraph.addReading(sensorValue);
         break;
       case "H":
         template = "log-humidity";
+        motionGraph.addReading(sensorValue);
         break;
       case "T":
         template = "log-temperature";
+        temperatureGraph.addReading(sensorValue);
         break;
     }
     prependToElement("#readings-container", template, sensorValue);
 });
+
 socket.on('roomsensorupdate', function(sensor) {
   console.log(sensor);
 });
