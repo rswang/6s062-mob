@@ -16,7 +16,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-  console.log(req.body);
   var data = req.body.message;
   console.log(data);
   RoomSensor.registerValue(data, function(err, results) {
@@ -33,6 +32,16 @@ router.post('/', function(req, res, next) {
     }
   });
 });
+
+router.put('/sensors/:sensorId', function(req, res) {
+  RoomSensor.findByIdAndUpdate(req.params.sensorId, req.body, {new: true}, function(err, sensor) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+    res.status(200).send(sensor);
+  });
+})
 
 router.get('/readings', function(req, res) {
   SensorValue.find({}).sort({date: -1}).limit(50).exec(function(err, sensorValues) {

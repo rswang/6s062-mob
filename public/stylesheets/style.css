@@ -9,3 +9,8 @@ a {
 #entries-container {
     font-family: "Courier", monospace;
 }
+
+.notes {
+    padding-left: 20px;
+    font-family: "Courier";
+}

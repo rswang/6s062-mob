@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function() { 
   readingsByType = _.groupBy(readings, function(r) {
     return r.type;
   });
@@ -95,4 +95,21 @@ $(document).ready(function() {
   temperatureGraph = ReadingGraph("#temperature-graph", readingsByType["T"]);
   humidityGraph = ReadingGraph("#humidity-graph", readingsByType["H"]);
   motionGraph = ReadingGraph("#motion-graph", readingsByType["M"]);
+
+  socket.on('reading', function(sensorValue) {
+      // Append readings to DOM
+      var template = "";
+      switch (sensorValue.type) {
+        case "M":
+          humidityGraph.addReading(sensorValue);
+          break;
+        case "H":
+          motionGraph.addReading(sensorValue);
+          break;
+        case "T":
+          temperatureGraph.addReading(sensorValue);
+          break;
+      }
+  });
+
 });

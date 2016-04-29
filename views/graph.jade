@@ -2,8 +2,6 @@ extends layout
 block head
   link(rel='stylesheet' href='/stylesheets/graph.css')
   script(src='/javascripts/graph.js')
-  script(src='https://cdn.socket.io/socket.io-1.4.5.js')
-  script(src='/javascripts/socketUtil.js')
   script(type="text/javascript").
     var readings=!{JSON.stringify(readings)};
 block content

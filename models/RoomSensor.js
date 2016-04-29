@@ -9,7 +9,8 @@ var RoomSensorSchema = mongoose.Schema({
   sensorID: {type: String},
   temperature: {type: Number},
   humidity: {type: Number},
-  lastMotionTime: {type: Date, default: new Date()}
+  lastMotionTime: {type: Date, default: new Date()},
+  notes: {type: String, default: 'N/A'},
 });
 
 var validTypes = ['M', 'H', 'T'];
