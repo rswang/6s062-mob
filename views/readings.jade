@@ -14,20 +14,20 @@ block content
             i.material-icons.circle.orange check
             span.title #{sensorValue.sensorID}
             p
-              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
               br
               | Motion detected
           else if sensorValue.type == "T"            
             i.material-icons.circle.blue check
             span.title #{sensorValue.sensorID}
             p
-              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
               br
               | <b>Temperature:</b> #{sensorValue.value}°F
           else if sensorValue.type == "H"
             i.material-icons.circle.purple check
             span.title #{sensorValue.sensorID}
             p
-              | <i>#{moment(sensorValue.date).format('MM/DD h:mm:ss A')}</i>
+              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
               br
               | <b>Humidity:</b> #{sensorValue.value}%

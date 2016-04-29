@@ -29,6 +29,8 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
       return;
     }
     var gatewayId = data.substring(0, 8);
+    console.log(gatewayId)
+    console.log(gatewayName)
     if (gatewayId != gatewayName) {
       callback({
         message: "Error: this gateway is not registered on the site"
