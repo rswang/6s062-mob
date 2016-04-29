@@ -64,6 +64,26 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
 }
 
 RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) {
+  var getSendInterval = function(type, sensorID) {
+    if (type == "H" || type == "T") {
+      if (sensorID == "SENSOR_1") {
+        return 100*1000;
+      } else if (sensorID == "SENSOR_2") {
+        return 200*1000;
+      } else if (sensorID == "SENSOR_3") {
+        return 300*1000;
+      }
+    } else if (type == "M") {
+      if (sensorID == "SENSOR_1") {
+        return 20*1000;
+      } else if (sensorID == "SENSOR_2") {
+        return 40*1000;
+      } else if (sensorID == "SENSOR_3") {
+        return 60*1000;
+      }
+    }
+  }
+
   var parseValueData = function(data) {
     data = data.trim();
     var newSensorValues = [];
@@ -71,15 +91,12 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
     var sensorConfigurations = {
       "H": {
         valueSize: 5,
-        sendInterval: 3*60*1000,
       },
       "T": {
         valueSize: 5,
-        sendInterval: 3*60*1000,
       },
       "M": {
         valueSize: 1,
-        sendInterval: 45*1000,
       },
     }
     var config = sensorConfigurations[type];
@@ -87,12 +104,12 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
     var endIndex = startIndex + config.valueSize;
     var numValues = (data.length - 1) / config.valueSize; 
     for (var i = 0; i < numValues; i++) {
-      var time = moment(entry.date).subtract((numValues - i - 1) * config.sendInterval, 'milliseconds');
+      var time = moment(entry.date).subtract((numValues - i - 1) * getSendInterval(type, sensor.sensorID), 'milliseconds');
       newSensorValues.push({
         sensorID: sensor.sensorID,
         type: type,
         value: parseFloat(data.substring(startIndex + i * config.valueSize, startIndex + (i+1) * config.valueSize)),
-        date: moment(entry.date).subtract((numValues - i - 1) * config.sendInterval, 'milliseconds'),
+        date: time,
       })
     }
     return newSensorValues;
