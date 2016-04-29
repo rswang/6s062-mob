@@ -16,7 +16,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-  console.log(req.body);
   var data = req.body.message;
   console.log(data);
   RoomSensor.registerValue(data, function(err, results) {
@@ -24,6 +23,7 @@ router.post('/', function(req, res, next) {
       res.status(500).send(err);
     } else {
       results.sensorValues.forEach(function(sensorValue) {
+        console.log(sensorValue);
         io.emit("reading", sensorValue);
       });
       io.emit("message", results.entry);
@@ -32,6 +32,16 @@ router.post('/', function(req, res, next) {
     }
   });
 });
+
+router.put('/sensors/:sensorId', function(req, res) {
+  RoomSensor.findByIdAndUpdate(req.params.sensorId, req.body, {new: true}, function(err, sensor) {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+    res.status(200).send(sensor);
+  });
+})
 
 router.get('/readings', function(req, res) {
   SensorValue.find({}).sort({date: -1}).limit(50).exec(function(err, sensorValues) {
@@ -52,6 +62,15 @@ router.get('/logs', function(req, res) {
       res.status(500).send(err);
     }
     res.render('logs', {title: '6.S062 Sensor Logs', entries: entries});
+  })
+})
+
+router.get('/graph', function(req, res) {
+    SensorValue.find({}).sort({date: 1}).exec(function(err, sensorValues) {
+    if (err) {
+      res.status(500).send(err);
+    }
+    res.render('graph', {title: '6.S062 Sensor Logs', readings: sensorValues});
   })
 })
 

@@ -2,12 +2,15 @@ var mongoose = require('mongoose');
 var SensorValue = require('./SensorValue');
 var Entry = require('./Entry');
 var async = require('async');
+var _ = require('lodash');
+var moment = require('moment');
 
 var RoomSensorSchema = mongoose.Schema({
   sensorID: {type: String},
   temperature: {type: Number},
   humidity: {type: Number},
-  lastMotionTime: {type: Date, default: new Date()}
+  lastMotionTime: {type: Date, default: new Date()},
+  notes: {type: String, default: 'N/A'},
 });
 
 var validTypes = ['M', 'H', 'T'];
@@ -61,27 +64,46 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
 }
 
 RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) {
-  var value1 = data.substring(0,8);
-  var value2 = data.substring(8,16);
-  async.map([value1, value2], function(value, done) {
-    var type = value.substring(0, 1);
-    if (validTypes.indexOf(type) == -1) {
-      done(null);
-      return;
+  var parseValueData = function(data) {
+    data = data.trim();
+    var newSensorValues = [];
+    var type = data.substring(0,1);
+    var sensorConfigurations = {
+      "H": {
+        valueSize: 5,
+        sendInterval: 3*60*1000,
+      },
+      "T": {
+        valueSize: 5,
+        sendInterval: 3*60*1000,
+      },
+      "M": {
+        valueSize: 1,
+        sendInterval: 45*1000,
+      },
     }
-    var reading = value.substring(1, 8);
+    var config = sensorConfigurations[type];
+    var startIndex = 1;
+    var endIndex = startIndex + config.valueSize;
+    var numValues = (data.length - 1) / config.valueSize; 
+    for (var i = 0; i < numValues; i++) {
+      var time = moment(entry.date).subtract((numValues - i - 1) * config.sendInterval, 'milliseconds');
+      newSensorValues.push({
+        sensorID: sensor.sensorID,
+        type: type,
+        value: parseFloat(data.substring(startIndex + i * config.valueSize, startIndex + (i+1) * config.valueSize)),
+        date: moment(entry.date).subtract((numValues - i - 1) * config.sendInterval, 'milliseconds'),
+      })
+    }
+    return newSensorValues;
+  }
 
-    SensorValue.create({
-      sensorID: sensor.sensorID,
-      type: type,
-      value: parseFloat(reading),
-      date: entry.date,
-    }, done);
-  }, function(err, sensorValues) {
+  SensorValue.create(parseValueData(data), function(err, sensorValues) {
     if (err) {
       callback(err);
       return;
     }
+    sensorValues = _.compact(sensorValues);
     sensorValues.forEach(function(sensorValue) {
       if (sensorValue != null) {
         if (sensorValue.type == "M") {

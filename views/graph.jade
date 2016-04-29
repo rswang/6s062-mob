@@ -1,0 +1,20 @@
+extends layout
+block head
+  link(rel='stylesheet' href='/stylesheets/graph.css')
+  script(src='/javascripts/graph.js')
+  script(type="text/javascript").
+    var readings=!{JSON.stringify(readings)};
+block content
+  include ./nav.jade
+  .container
+    h1= title
+    p Welcome to #{title}
+    div
+      h3 Temperature
+      #temperature-graph
+    div
+      h3 Humidity
+      #humidity-graph
+    div
+      h3 Motion
+      #motion-graph
