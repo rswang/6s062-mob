@@ -10,6 +10,7 @@ var RoomSensorSchema = mongoose.Schema({
   temperature: {type: Number},
   humidity: {type: Number},
   lastMotionTime: {type: Date, default: new Date()},
+  lastSeen: {type: Date},
   notes: {type: String, default: 'N/A'},
 });
 
@@ -20,6 +21,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
   var that = this;
   Entry.create({
     data: data,
+    date: new Date()
   }, function(err, entry) {
     if (err) {
       callback(err);
@@ -32,8 +34,6 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
       return;
     }
     var gatewayId = data.substring(0, 8);
-    console.log(gatewayId)
-    console.log(gatewayName)
     if (gatewayId != gatewayName) {
       callback({
         message: "Error: this gateway is not registered on the site"
@@ -55,7 +55,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
             return;
           }
           RoomSensor.updateStatus(doc, data.substring(16), entry, callback);
-		});
+		    });
       } else {
         RoomSensor.updateStatus(roomSensors[0], data.substring(16), entry, callback);
       }
@@ -64,23 +64,13 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
 }
 
 RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) {
-  var getSendInterval = function(type, sensorID) {
+  var getSendInterval = function(type, lastSeen) {
+    console.log(lastSeen);
+    // TODO incorporate last seen into send interval
     if (type == "H" || type == "T") {
-      if (sensorID == "SENSOR_1") {
-        return 100*1000;
-      } else if (sensorID == "SENSOR_2") {
-        return 200*1000;
-      } else if (sensorID == "SENSOR_3") {
-        return 300*1000;
-      }
+      return 5*1000;
     } else if (type == "M") {
-      if (sensorID == "SENSOR_1") {
-        return 20*1000;
-      } else if (sensorID == "SENSOR_2") {
-        return 40*1000;
-      } else if (sensorID == "SENSOR_3") {
-        return 60*1000;
-      }
+      return 1000;
     }
   }
 
@@ -104,7 +94,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
     var endIndex = startIndex + config.valueSize;
     var numValues = (data.length - 1) / config.valueSize; 
     for (var i = 0; i < numValues; i++) {
-      var time = moment(entry.date).subtract((numValues - i - 1) * getSendInterval(type, sensor.sensorID), 'milliseconds');
+      var time = moment(entry.date).subtract((numValues - i - 1) * getSendInterval(type, sensor.lastSeen), 'milliseconds');
       newSensorValues.push({
         sensorID: sensor.sensorID,
         type: type,
@@ -136,6 +126,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
         }
       }
     });
+    sensor.lastSeen = new Date();
     sensor.save();
     callback(null, {
         sensor: sensor,

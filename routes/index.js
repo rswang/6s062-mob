@@ -17,13 +17,11 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
   var data = req.body.message;
-  console.log(data);
   RoomSensor.registerValue(data, function(err, results) {
     if (err) {
       res.status(500).send(err);
     } else {
       results.sensorValues.forEach(function(sensorValue) {
-        console.log(sensorValue);
         io.emit("reading", sensorValue);
       });
       io.emit("message", results.entry);
