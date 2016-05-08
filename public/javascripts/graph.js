@@ -5,24 +5,37 @@ $(document).ready(function() {
 
   var ReadingGraph = function(selector, dataReadings) {
     var that = Object.create(ReadingGraph.prototype);
-
-    var n = dataReadings.length;
-
+    
+    var xData = [];
+    var yData = [];
+    var data = [];
     // example date: 2016-05-08T20:52:01.042Z
     // formatted date: %Y-%m-%dT%H:%M:%S.%LZ
     var formatDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ");
-    var xData = dataReadings.map(function(d, index) {
-      return formatDate.parse(d.date);
-    });
-    var yData = dataReadings.map(function(d, index) {
-      return +d.value;
-    });
-    var data = dataReadings.map(function(d, index) {
-      return {
-        date: xData[index],
-        value: yData[index]
-      };
-    });
+    var n = 0;
+
+    if (dataReadings) {
+      n = dataReadings.length;
+
+      xData = dataReadings.map(function(d, index) {
+        return formatDate.parse(d.date);
+      });
+      yData = dataReadings.map(function(d, index) {
+        return +d.value;
+      });
+      data = dataReadings.map(function(d, index) {
+        return {
+          date: xData[index],
+          value: yData[index]
+        };
+      });
+
+      if (n > 100) {
+        xData = xData.slice(n-100);
+        yData = yData.slice(n-100);
+        zData = zData.slice(n-100);
+      }
+    }
 
     var margin = {top: 6, right: 40, bottom: 20, left: 40},
       width = 600 - margin.right,
