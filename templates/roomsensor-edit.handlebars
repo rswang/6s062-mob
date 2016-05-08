@@ -1,4 +1,4 @@
-<li id="sensor-{{sensorID}}" class="collection-item avatar roomsensor" data-sensor-id={{sensorID}}>
+<li id="sensor-{{sensorID}}" class="collection-item avatar roomsensor editing" data-sensor-id={{sensorID}}>
     <i class="material-icons circle green">location_off</i>
     <span class="title">{{sensorID}}</span>
     <p>
@@ -20,8 +20,7 @@
       <form id="edit-form-{{sensorID}}" class="col s12" role="form">
         <div class="row">
           <div class="input-field col s12">
-            <textarea id="notes-textarea" name="notes" length="120" class="materialize-textarea" placeholder={{notes}}></textarea>
-            <label for="notes">Notes</label>
+            <input id="notes-textarea" name="notes" length="120" class="materialize-input"></input>
           </div>
         </div>
       </form>

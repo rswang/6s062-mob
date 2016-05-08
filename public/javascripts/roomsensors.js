@@ -32,9 +32,11 @@ $(document).ready(function() {
 
     socket.on('roomsensorupdate', function(sensor) {
         sensorsById[sensor.sensorID] = sensor;
-        replaceElement("#sensor-" + sensor.sensorID, "roomsensor-collection", sensor);
+        if ($("#sensor-" + sensor.sensorID).hasClass("editing")) {
+          replaceElement("#sensor-" + sensor.sensorID, "roomsensor-edit", sensor);
+        } else {
+          replaceElement("#sensor-" + sensor.sensorID, "roomsensor-collection", sensor);
+        }
     });
-
-
 
 })

@@ -34,3 +34,4 @@ var loadElement = function(selector, template, data) {
 var replaceElement = function(selector, template, data) {
     $(selector).replaceWith(Handlebars.templates[template](data));
 }
+

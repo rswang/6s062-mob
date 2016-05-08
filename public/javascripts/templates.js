@@ -57,7 +57,7 @@ templates['roomsensor-edit'] = template({"compiler":[7,">= 4.0.0"],"main":functi
 
   return "<li id=\"sensor-"
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
-    + "\" class=\"collection-item avatar roomsensor\" data-sensor-id="
+    + "\" class=\"collection-item avatar roomsensor editing\" data-sensor-id="
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
     + ">\n    <i class=\"material-icons circle green\">location_off</i>\n    <span class=\"title\">"
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
@@ -71,8 +71,6 @@ templates['roomsensor-edit'] = template({"compiler":[7,">= 4.0.0"],"main":functi
     + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
     + "\n    </p>\n    <a class=\"secondary-content\">\n      <i class=\"material-icons roomsensor-cancel\">cancel</i>\n      <i class=\"material-icons roomsensor-save\">done</i>\n    </a>\n    <div class=\"row\">\n      <form id=\"edit-form-"
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
-    + "\" class=\"col s12\" role=\"form\">\n        <div class=\"row\">\n          <div class=\"input-field col s12\">\n            <textarea id=\"notes-textarea\" name=\"notes\" length=\"120\" class=\"materialize-textarea\" placeholder="
-    + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
-    + "></textarea>\n            <label for=\"notes\">Notes</label>\n          </div>\n        </div>\n      </form>\n    </div>\n</li>\n\n";
+    + "\" class=\"col s12\" role=\"form\">\n        <div class=\"row\">\n          <div class=\"input-field col s12\">\n            <input id=\"notes-textarea\" name=\"notes\" length=\"120\" class=\"materialize-input\"></input>\n          </div>\n        </div>\n      </form>\n    </div>\n</li>\n\n";
 },"useData":true});
 })();
