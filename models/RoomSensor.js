@@ -140,10 +140,8 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
       if (sensorValue != null) {
         if (sensorValue.type == "M") {
           if (sensorValue.value == "1") {
-            console.log("setting " + sensor.sensorID + " to " + sensorValue.value);
             sensor.lastMotionTime = sensorValue.date;
           }
-          console.log(sensorValue.value);
         } else if (sensorValue.type == "T") {
           sensor.temperature = sensorValue.value;
         } else if (sensorValue.type == "H") {

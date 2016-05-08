@@ -9,8 +9,6 @@
         <b>Humidity:</b> {{humidity}}%
         <br/>
         <b>Notes:</b>
-        <br/>
-        {{notes}}
     </p>
     <a class="secondary-content">
       <i class="material-icons roomsensor-cancel">cancel</i>
@@ -20,7 +18,7 @@
       <form id="edit-form-{{sensorID}}" class="col s12" role="form">
         <div class="row">
           <div class="input-field col s12">
-            <input id="notes-textarea" name="notes" length="120" class="materialize-input"></input>
+            <input id="notes-textarea" name="notes" length="120" class="materialize-input" value="{{notes}}"></input>
           </div>
         </div>
       </form>

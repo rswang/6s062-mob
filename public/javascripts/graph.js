@@ -6,87 +6,87 @@ $(document).ready(function() {
   var ReadingGraph = function(selector, dataReadings) {
     var that = Object.create(ReadingGraph.prototype);
 
-    var n = dataReadings.length,
-        data = dataReadings.map(function(d, index) {
-          return {
-            date: new Date(d.date),
-            value: d.value,
-          }
-        });
+    var n = dataReadings.length;
 
-    var margin = {top: 6, right: 0, bottom: 20, left: 40},
-        width = 800 - margin.right,
-        height = 320 - margin.top - margin.bottom;
+    // example date: 2016-05-08T20:52:01.042Z
+    // formatted date: %Y-%m-%dT%H:%M:%S.%LZ
+    var formatDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ");
+    var xData = dataReadings.map(function(d, index) {
+      return formatDate.parse(d.date);
+    });
+    var yData = dataReadings.map(function(d, index) {
+      return +d.value;
+    });
+    var data = dataReadings.map(function(d, index) {
+      return {
+        date: xData[index],
+        value: yData[index]
+      };
+    });
+
+    var margin = {top: 6, right: 40, bottom: 20, left: 40},
+      width = 600 - margin.right,
+      height = 270 - margin.top - margin.bottom;
 
     var x = d3.time.scale()
-        .domain([d3.min(data, function(d) {return d.date}), d3.max(data, function(d) {return d.date})])
-        .range([0, width]);
+      .domain([d3.min(xData), d3.max(xData)])
+      .range([0, width]);
 
     var y = d3.scale.linear()
-        .domain([0, d3.max(data, function(d) {return d.value})])
-        .range([height, 0]);
+      .domain([0, d3.max(yData)])
+      .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
 
     var line = d3.svg.line()
-        .interpolate("basis")
-        .x(function(d, i) { return x(d.date); })
-        .y(function(d, i) { return y(d.value); });
+      .x(function(d) { return x(d.date); })
+      .y(function(d) {return y(d.value); });
 
-    var svg = d3.select(selector).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .style("margin-left", -margin.left + "px")
-      .append("g")
+    var graph = d3.select(selector).append("svg:svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("svg:g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("defs").append("clipPath")
-        .attr("id", "clip")
-      .append("rect")
-        .attr("width", width)
-        .attr("height", height);
+    var axis = graph.append("svg:g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + (height) + ")")
+      .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
 
-    var axis = svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
-
-    var yaxis = svg.append("g")
-        .attr("class", "y axis")
+    graph.append("svg:g")
+      .attr("class", "y axis")
       .attr("transform", "translate(0,0)")
-      .call(d3.svg.axis()
-        .orient("left")
-        .scale(y));
+      .call(yAxis);
 
-    var path = svg.append("g")
-        .attr("clip-path", "url(#clip)")
-      .append("path")
-        .datum(data, function(d) { return d.value;})
-        .attr("class", "line");
+    graph.append("svg:path").attr("d", line(data))
+      .attr("class","line");
 
     that.addReading = function(reading) {
-      reading.date = new Date(reading.date);
+      reading.date = formatDate.parse(reading.date);
+      reading.value = +reading.value;
       data.push(reading);
+      xData.push(reading.date);
+      yData.push(reading.value);
 
-      x.domain([d3.min(data, function(d) {return d.date}), d3.max(data, function(d) {return d.date})]);
-      y.domain([0, d3.max(data, function(d) {return d.value})]);
+      x.domain([d3.min(xData), d3.max(xData)]);
+      y.domain([0, d3.max(yData)]);
 
       // redraw the line
-      svg.select(".line")
-          .attr("d", line)
-          .attr("transform", null);
+      graph.select(".line").attr("d", line(data));
 
       // slide axis and line
       axis.call(x.axis);
-      path.transition()
-          .attr("transform", "translate(" + x(data[1].date) + ")");
 
       // pop oldest data point
-      data.shift();
-    }
-
-    // initialize graph
-    var i = 0;
-    for (var i = 0; i < dataReadings.length; i++) {
-        that.addReading(dataReadings[i]);
+      if (data.length > 100) {
+        data.shift();
+      }
     }
 
     return that;
@@ -101,10 +101,10 @@ $(document).ready(function() {
       var template = "";
       switch (sensorValue.type) {
         case "M":
-          humidityGraph.addReading(sensorValue);
+          motionGraph.addReading(sensorValue);
           break;
         case "H":
-          motionGraph.addReading(sensorValue);
+          humidityGraph.addReading(sensorValue);
           break;
         case "T":
           temperatureGraph.addReading(sensorValue);

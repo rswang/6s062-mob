@@ -63,8 +63,8 @@ router.get('/logs', function(req, res) {
   })
 })
 
-router.get('/graph', function(req, res) {
-    SensorValue.find({}).sort({date: 1}).exec(function(err, sensorValues) {
+router.get('/:sensorID', function(req, res) {
+    SensorValue.find({sensorID: req.params.sensorID}).sort({date: 1}).exec(function(err, sensorValues) {
     if (err) {
       res.status(500).send(err);
     }
