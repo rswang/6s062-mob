@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
   var data = req.body.message;
-  RoomSensor.registerValue(data, function(err, results) {
+  RoomSensor.registerReading(data, function(err, results) {
     if (err) {
       res.status(500).send(err);
     } else {

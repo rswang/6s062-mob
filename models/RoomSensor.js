@@ -9,7 +9,7 @@ var RoomSensorSchema = mongoose.Schema({
   sensorID: {type: String},
   temperature: {type: Number},
   humidity: {type: Number},
-  lastMotionTime: {type: Date, default: new Date()},
+  lastMotionTime: {type: Date},
   lastSeen: {type: Date},
   notes: {type: String, default: 'N/A'},
 });
@@ -17,8 +17,15 @@ var RoomSensorSchema = mongoose.Schema({
 var validTypes = ['M', 'H', 'T'];
 var gatewayName = "GATEWAY1";
 
-RoomSensorSchema.statics.registerValue = function(data, callback) {
+/**
+ * Method called when the server receives a new reading from the gateway.
+ * The data is the message from the gateway. It should be in the format:
+ * GATEWAY1SENSOR_X<Data>
+ * Data can be motion data or DHT data.
+ **/
+RoomSensorSchema.statics.registerReading = function(data, callback) {
   var that = this;
+  // Create log entry
   Entry.create({
     data: data,
     date: new Date()
@@ -29,7 +36,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
     }
     if (entry.length < 32) {
       callback({
-        message: "Entry is not formatted correctly: expected 32-byte data"
+        message: "Entry is not formatted correctly: expected 32-byte data payload"
       });
       return;
     }
@@ -49,6 +56,7 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
         return;
       }
       if (roomSensors.length == 0) {
+        // Create new sensor if this sensor does not exist.
         RoomSensor.create({sensorID: sensorID}, function(err, doc) {
           if (err) {
             callback(err);
@@ -63,46 +71,62 @@ RoomSensorSchema.statics.registerValue = function(data, callback) {
   });
 }
 
+/**
+ * Updates the status of a sensor in the database.
+ * This method handles motion data and DHT data.
+ * @param sensor - the sensor that should be updated.
+ * @param data - the data payload from the gateway message. This data payload
+ *                does NOT include the gateway ID and sensor ID.
+ * @param entry - the log entry that was created when the data was received.
+ *                we use this entry as a date reference to enforce time consistency
+ *                within our records.
+ * DATA FORMATS:
+ * Motion data: 'M1' -> indicates motion
+ * DHT data: 'T70.00H60.00' -> indicates temp of 70.00 and humidity of 60.00
+ **/
 RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) {
-  var getSendInterval = function(type, lastSeen) {
-    console.log(lastSeen);
-    // TODO incorporate last seen into send interval
-    if (type == "H" || type == "T") {
-      return 5*1000;
-    } else if (type == "M") {
-      return 1000;
-    }
-  }
-
   var parseValueData = function(data) {
+    // Remove whitespace at the end of the data payload
     data = data.trim();
-    var newSensorValues = [];
+
+    // This type is either 'M' or 'T'.
+    // 'M' indicates motion data.
+    // 'T' indicates DHT data.
     var type = data.substring(0,1);
-    var sensorConfigurations = {
-      "H": {
-        valueSize: 5,
-      },
-      "T": {
-        valueSize: 5,
-      },
-      "M": {
-        valueSize: 1,
-      },
-    }
-    var config = sensorConfigurations[type];
-    var startIndex = 1;
-    var endIndex = startIndex + config.valueSize;
-    var numValues = (data.length - 1) / config.valueSize; 
-    for (var i = 0; i < numValues; i++) {
-      var time = moment(entry.date).subtract((numValues - i - 1) * getSendInterval(type, sensor.lastSeen), 'milliseconds');
-      newSensorValues.push({
+    var values = [];
+
+    if (type == 'M' && data.length > 1) {
+      motionReading = data.substring(1,2);
+      // Sensed motion
+      values.push({
         sensorID: sensor.sensorID,
         type: type,
-        value: parseFloat(data.substring(startIndex + i * config.valueSize, startIndex + (i+1) * config.valueSize)),
-        date: time,
-      })
+        value: motionReading,
+        date: entry.date
+      });
+    } else if (type == 'T') {
+      // First parse into temp and humidity data
+      var n = data.indexOf('H');
+      if (n != -1) { // If there's no H data, the entry is malformed.
+        var tempReading = data.substring(1,n);
+        var humidityReading = data.substring(n+1);
+        // Temp data
+        values.push({
+          sensorID: sensor.sensorID,
+          type: type,
+          value: tempReading,
+          date: entry.date
+        });
+        // Humidity data
+        values.push({
+          sensorID: sensor.sensorID,
+          type: 'H',
+          value: humidityReading,
+          date: entry.date
+        });
+      }
     }
-    return newSensorValues;
+    return values;
   }
 
   SensorValue.create(parseValueData(data), function(err, sensorValues) {
@@ -111,10 +135,15 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
       return;
     }
     sensorValues = _.compact(sensorValues);
+    // Update sensor based on reading values
     sensorValues.forEach(function(sensorValue) {
       if (sensorValue != null) {
         if (sensorValue.type == "M") {
-          sensor.lastMotionTime = sensorValue.date;
+          if (sensorValue.value == "1") {
+            console.log("setting " + sensor.sensorID + " to " + sensorValue.value);
+            sensor.lastMotionTime = sensorValue.date;
+          }
+          console.log(sensorValue.value);
         } else if (sensorValue.type == "T") {
           sensor.temperature = sensorValue.value;
         } else if (sensorValue.type == "H") {
@@ -123,16 +152,18 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
             callback({
                 message: "Invalid sensor type",
             });
+            return;
         }
       }
     });
-    sensor.lastSeen = new Date();
+    sensor.lastSeen = entry.date
     sensor.save();
     callback(null, {
         sensor: sensor,
         sensorValues: sensorValues,
         entry: entry,
     });
+    return;
   });
 };
 

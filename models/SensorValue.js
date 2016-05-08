@@ -4,7 +4,7 @@ var SensorValueSchema = mongoose.Schema({
   sensorID: {type: String},
   type: {type: String, enum: ['M', 'H', 'T']}, // M, H, T
   value: {type: String},
-  date: {type: Date, default: new Date()}
+  date: {type: Date}
 });
 
 var SensorValue = mongoose.model('SensorValue', SensorValueSchema);
