@@ -4,14 +4,15 @@ $(document).ready(function() {
       var template = "";
       switch (sensorValue.type) {
         case "M":
-          humidityGraph.addReading(sensorValue);
+          template = "log-motion";
           break;
         case "H":
-          motionGraph.addReading(sensorValue);
+          template = "log-humidity";
           break;
         case "T":
-          temperatureGraph.addReading(sensorValue);
+          template = "log-motion";
           break;
       }
+      prependToElement("#readings-container", template, sensorValue)
   });  
 })
