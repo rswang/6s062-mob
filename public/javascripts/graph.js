@@ -109,20 +109,20 @@ $(document).ready(function() {
   humidityGraph = ReadingGraph("#humidity-graph", readingsByType["H"]);
   motionGraph = ReadingGraph("#motion-graph", readingsByType["M"]);
 
-  socket.on('reading', function(sensorValue) {
-      // Append readings to DOM
-      var template = "";
-      switch (sensorValue.type) {
-        case "M":
-          motionGraph.addReading(sensorValue);
-          break;
-        case "H":
-          humidityGraph.addReading(sensorValue);
-          break;
-        case "T":
-          temperatureGraph.addReading(sensorValue);
-          break;
-      }
-  });
+//   socket.on('reading', function(sensorValue) {
+//       // Append readings to DOM
+//       var template = "";
+//       switch (sensorValue.type) {
+//         case "M":
+//           motionGraph.addReading(sensorValue);
+//           break;
+//         case "H":
+//           humidityGraph.addReading(sensorValue);
+//           break;
+//         case "T":
+//           temperatureGraph.addReading(sensorValue);
+//           break;
+//       }
+//   });
 
 });
