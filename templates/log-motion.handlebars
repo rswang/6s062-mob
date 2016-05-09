@@ -1,9 +1,17 @@
 <li class="collection-item avatar">
+    {{#ifSenseMotion value}}
     <i class="material-icons circle orange">check</i>
+    {{else}}
+    <i class="material-icons circle orange">clear</i>
+    {{/ifSenseMotion}}
     <span class="title">{{sensorID}}</span>
     <p>
         <i>{{formatDate date}}</i>
         <br>
+        {{#ifSenseMotion value}}
         Motion detected
+        {{else}}
+        No motion
+        {{/ifSenseMotion}}
     </p>
 </li>

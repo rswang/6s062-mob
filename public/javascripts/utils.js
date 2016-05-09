@@ -12,6 +12,10 @@ Handlebars.registerHelper('relativeDate', function(date) {
     return moment(date).fromNow();
 })
 
+Handlebars.registerHelper('ifSenseMotion', function(value, options) {
+    return value == 1 ? options.fn(this) : options.inverse(this);
+});
+
 
 // Append template to specified selector
 var appendToElement = function(selector, template, data) {
