@@ -129,7 +129,7 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
     return values;
   }
 
-  SensorValue.create(parseValueData(data), function(err, sensorValues) {
+  SensorValue.createWithAggregation(sensor, parseValueData(data), function(err, sensorValues) {
     if (err) {
       callback(err);
       return;
