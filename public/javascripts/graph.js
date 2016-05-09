@@ -33,7 +33,7 @@ $(document).ready(function() {
       if (n > 100) {
         xData = xData.slice(n-100);
         yData = yData.slice(n-100);
-        zData = zData.slice(n-100);
+        data = data.slice(n-100);
       }
     }
 
