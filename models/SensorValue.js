@@ -17,42 +17,63 @@ SensorValueSchema.statics.createWithAggregation = function(sensor, values, callb
     }
     // aggregation step
     async.each(sensorValues, function(value, done) {
-      that.find({sensorID: sensor.sensorID, type: value.type})
+      if (value.type == 'M') {
+        // If motion was just sensed and was also sensed recently,
+        // we assume that motion took place in the entire interim
+        // time period.
+        // We define "recently" as a 1 minute period of time.
+        if (value.value == "1") {
+          var d = new Date();
+          d.setMinutes(d.getMinutes() - 1);
+          that.find({sensorID: sensor.sensorID, type: value.type,
+            date: {$gte: d}}).exec(function(err, foundValues) {
+            var motion = false;
+            // Motion values that are 0 that we should delete
+            var valuesToDelete = [];
+            var last = foundValues.length - 1;
+            foundValues.forEach(function(val, index) {
+              // If motion was also detected in the past minute, then
+              // we should delete all intermediate values.
+              if (motion && index != last) {
+                valuesToDelete.push(val);
+              } else if (val.value == "1") {
+                motion = true;
+              }
+            });
+            async.each(valuesToDelete, function(value, delDone) {
+              that.remove({_id: value._id}, function(err) {
+                delDone(err);
+              });
+            }, function(err) {
+              if (err) {
+                done(err);
+                return;
+              }
+            });
+          });
+        }
+        done();
+      } else {
+        that.find({sensorID: sensor.sensorID, type: value.type})
         .sort({date:-1}).limit(3).exec(function(err, foundValues) {
           if (err) {
             done(err);
             return;
           }
           // only try to aggregate if there are >=3 readings of a type
-          if (foundValues.length >= 3) {
-            var deleted = false;
-            if (value.type == 'M') {
-              // If motion was just sensed and was also sensed recently,
-              // we assume that motion took place in the entire interim
-              // time period.
-              // We define "recently" as a 1 minute period of time.
-              if (foundValues[0].value == "1" && foundValues[2].value == "1"
-                  && Math.abs(foundValues[2].date.getTime() - foundValues[0].date.getTime()) < 60000) {
-                that.remove({_id: foundValues[1]._id}, function(err) {
-                  deleted = true;
-                  if (err) {
-                    done(err);
-                  }
-                });
+          if (foundValues.length >= 3 &&
+              foundValues[0].value == foundValues[1].value &&
+              foundValues[1].value == foundValues[2].value) {
+            that.remove({_id: foundValues[1]._id}, function(err) {
+              if (err) {
+                done(err);
               }
-            }
-            if (!deleted && foundValues[0].value == foundValues[1].value &&
-                foundValues[1].value == foundValues[2].value) {
-              that.remove({_id: foundValues[1]._id}, function(err) {
-                if (err) {
-                  done(err);
-                }
-              });
-            }
+            });
           }
           done();
           return;
-      });
+        });
+      }
     }, function(err) {
       if (err) {
         callback(err);
