@@ -17,41 +17,39 @@ SensorValueSchema.statics.createWithAggregation = function(sensor, values, callb
     }
     // aggregation step
     async.each(sensorValues, function(value, done) {
-      if (value.type == 'M') {
+      if (value.type == 'M' && value.value == "1") {
         // If motion was just sensed and was also sensed recently,
         // we assume that motion took place in the entire interim
         // time period.
         // We define "recently" as a 1 minute period of time.
-        if (value.value == "1") {
-          var d = new Date();
-          d.setMinutes(d.getMinutes() - 1);
-          that.find({sensorID: sensor.sensorID, type: value.type,
-            date: {$gte: d}}).exec(function(err, foundValues) {
-            var motion = false;
-            // Motion values that are 0 that we should delete
-            var valuesToDelete = [];
-            var last = foundValues.length - 1;
-            foundValues.forEach(function(val, index) {
-              // If motion was also detected in the past minute, then
-              // we should delete all intermediate values.
-              if (motion && index != last) {
-                valuesToDelete.push(val);
-              } else if (val.value == "1") {
-                motion = true;
-              }
-            });
-            async.each(valuesToDelete, function(value, delDone) {
-              that.remove({_id: value._id}, function(err) {
-                delDone(err);
-              });
-            }, function(err) {
-              if (err) {
-                done(err);
-                return;
-              }
-            });
+        var d = new Date();
+        d.setMinutes(d.getMinutes() - 1);
+        that.find({sensorID: sensor.sensorID, type: value.type,
+          date: {$gte: d}}).exec(function(err, foundValues) {
+          var motion = false;
+          // Motion values that are 0 that we should delete
+          var valuesToDelete = [];
+          var last = foundValues.length - 1;
+          foundValues.forEach(function(val, index) {
+            // If motion was also detected in the past minute, then
+            // we should delete all intermediate values.
+            if (motion && index != last) {
+              valuesToDelete.push(val);
+            } else if (val.value == "1") {
+              motion = true;
+            }
           });
-        }
+          async.each(valuesToDelete, function(value, delDone) {
+            that.remove({_id: value._id}, function(err) {
+              delDone(err);
+            });
+          }, function(err) {
+            if (err) {
+              done(err);
+              return;
+            }
+          });
+        });
         done();
       } else {
         that.find({sensorID: sensor.sensorID, type: value.type})
