@@ -19,7 +19,7 @@ Handlebars.registerHelper('ifSenseMotion', function(value, options) {
 });
 
 Handlebars.registerHelper('ifOccupied', function(date, options) {
-    return moment(date).isBefore(moment().add(inactivityThreshold, 'minutes')) ? options.fn(this) : options.inverse(this);
+    return moment().isBefore(moment(date).add(inactivityThreshold, 'minutes')) ? options.fn(this) : options.inverse(this);
 })
 
 // Append template to specified selector

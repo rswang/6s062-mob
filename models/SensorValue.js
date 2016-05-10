@@ -50,7 +50,7 @@ SensorValueSchema.statics.createWithAggregation = function(sensor, values, callb
             }
           });
         });
-        done();
+	done();
       } else {
         that.find({sensorID: sensor.sensorID, type: value.type})
         .sort({date:-1}).limit(3).exec(function(err, foundValues) {

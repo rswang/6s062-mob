@@ -74,7 +74,7 @@ router.get('/calendar', function(req, res) {
 
 router.get('/:sensorID', function(req, res) {
   // TODO make this better
-  SensorValue.find({sensorID: req.params.sensorID}).sort({date: -1}).limit(1000).exec(function(err, sensorValues) {
+  SensorValue.find({sensorID: req.params.sensorID}).sort({date: 1}).exec(function(err, sensorValues) {
     if (err) {
       res.status(500).send(err);
     }

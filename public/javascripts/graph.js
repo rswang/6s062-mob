@@ -18,7 +18,7 @@ $(document).ready(function() {
       n = dataReadings.length;
 
       xData = dataReadings.map(function(d, index) {
-        return formatDate.parse(d.date);
+        return d3.time.hour.offset(formatDate.parse(d.date),-4);
       });
       yData = dataReadings.map(function(d, index) {
         return +d.value;
