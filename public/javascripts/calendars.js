@@ -6,9 +6,9 @@ $(document).ready(function() {
 
     var calendarEvents = events.map(function(sensorEvents, i) {
         var color = colors[i];
-        return sensorEvents.map(function(e) {
+        return sensorEvents.map(function(e, j) {
             return {
-                title: e.sensorID,
+                title: e.sensorID + " " + j,
                 color: color,
                 start: e.startDate,
                 end: e.endDate,

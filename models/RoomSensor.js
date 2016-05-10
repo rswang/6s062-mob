@@ -175,6 +175,7 @@ RoomSensorSchema.statics.getEvents = function(callback) {
           done(err);
           return;
         }
+        console.log(sensorValues);
         var events = [];
         var i = 0;
         var startDate = null;
@@ -183,21 +184,24 @@ RoomSensorSchema.statics.getEvents = function(callback) {
         while (i < sensorValues.length) {
           sensorValue = sensorValues[i];
           if (sensorValue.value == 0) {
-            if (motion) {
+            if (motion && moment(sensorValue.date).isAfter(moment(endDate).add('minutes', 5))) {
               motion = false;
-              endDate = sensorValues[i - 1].date;
-              events.push({
-                startDate: startDate,
-                endDate: endDate,
-                sensorID: sensor.sensorID,
-                type: 'M',
-              });
+              if (startDate != endDate) {
+                events.push({
+                  startDate: startDate,
+                  endDate: endDate,
+                  sensorID: sensor.sensorID,
+                  type: 'M',
+                });
+              }
+              
             }
           } else if (sensorValues[i].value == 1) {
             if (!motion) {
               motion = true;
               startDate = sensorValue.date;
             }
+            endDate = sensorValue.date
           }
           i++;
 
