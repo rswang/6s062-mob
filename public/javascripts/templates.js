@@ -67,7 +67,7 @@ templates['roomsensor-collection'] = template({"1":function(container,depth0,hel
     + "\" class=\"collection-item avatar roomsensor\" data-sensor-id="
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
     + ">\n"
-    + ((stack1 = (helpers.ifOccupied || (depth0 && depth0.ifOccupied) || alias2).call(alias1,(depth0 != null ? depth0.lastSeen : depth0),{"name":"ifOccupied","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + ((stack1 = (helpers.ifOccupied || (depth0 && depth0.ifOccupied) || alias2).call(alias1,(depth0 != null ? depth0.lastMotionTime : depth0),{"name":"ifOccupied","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "    <span class=\"title\">"
     + alias4(((helper = (helper = helpers.sensorID || (depth0 != null ? depth0.sensorID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sensorID","hash":{},"data":data}) : helper)))
     + "</span>\n    <p>\n        <i>Last seen "
