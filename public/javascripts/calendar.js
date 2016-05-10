@@ -8,12 +8,15 @@ var colors = randomColor({luminosity: 'dark', count: events.length});
 
     var calendarEvents = events.map(function(sensorEvents, i) {
         var color = colors[i];
+        var convertDate = function(date) {
+          return new Date(date);
+        }
         return sensorEvents.map(function(e, j) {
             return {
                 title: e.sensorID + " " + j,
                 color: color,
-                start: formatDate(e.startDate),
-                end: formatDate(e.endDate),
+                start: convertDate(e.startDate),
+                end: convertDate(e.endDate),
             }
         });
     })
