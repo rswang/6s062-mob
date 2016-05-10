@@ -165,6 +165,50 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
   });
 };
 
+RoomSensorSchema.statics.getEvents = function(callback) {
+  var that = this;
+
+  that.find({}, function(err, sensors) {
+    async.map(sensors, function(sensor, done) {
+      SensorValue.find({sensorID: sensor.sensorID, type: 'M'}).sort({date: 1}).exec(function(err, sensorValues) {
+        if (err) {
+          done(err);
+          return;
+        }
+        var events = [];
+        var i = 0;
+        var startDate = null;
+        var endDate = null;
+        var motion = false;
+        while (i < sensorValues.length) {
+          sensorValue = sensorValues[i];
+          if (sensorValue.value == 0) {
+            if (motion) {
+              motion = false;
+              endDate = sensorValues[i - 1].date;
+              events.push({
+                startDate: startDate,
+                endDate: endDate,
+                sensorID: sensor.sensorID,
+                type: 'M',
+              });
+            }
+          } else if (sensorValues[i].value == 1) {
+            if (!motion) {
+              motion = true;
+              startDate = sensorValue.date;
+            }
+          }
+          i++;
+
+        }
+        done(err, events);
+      })
+    }, callback)
+  })
+}
+
+
 var RoomSensor = mongoose.model('RoomSensor', RoomSensorSchema);
 
 module.exports = RoomSensor;

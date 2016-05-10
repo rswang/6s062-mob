@@ -63,6 +63,15 @@ router.get('/logs', function(req, res) {
   })
 })
 
+router.get('/calendars', function(req, res) {
+  RoomSensor.getEvents(function(err, events) {
+    if (err) {
+      res.status(500).send(err);
+    }
+    res.render('calendars', {title: '6.S062 Sensor Logs', events: events});
+  })
+});
+
 router.get('/:sensorID', function(req, res) {
   // TODO make this better
   SensorValue.find({sensorID: req.params.sensorID}).sort({date: -1}).limit(1000).exec(function(err, sensorValues) {
@@ -72,5 +81,7 @@ router.get('/:sensorID', function(req, res) {
     res.render('graph', {title: '6.S062 Sensor Logs', readings: sensorValues});
   })
 })
+
+
 
 module.exports = router;

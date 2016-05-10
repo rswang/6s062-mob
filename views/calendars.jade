@@ -1,0 +1,11 @@
+extends layout
+block head
+  script(src='/javascripts/calendars.js')
+  script(type="text/javascript").
+    var events=!{JSON.stringify(events)};
+block content
+  include ./nav.jade
+  .container
+    h1= title
+    p Welcome to #{title}
+    div#calendar
