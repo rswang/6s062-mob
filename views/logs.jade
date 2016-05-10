@@ -4,8 +4,9 @@ block head
 block content
   include ./nav.jade
   .container
-    h1= title
-    p Welcome to #{title}
-    ul#entries-container
-      each entry in entries
-        li [#{moment(entry.date).format('MM/DD hh:mm:ss A')}] #{entry.data}
+    .row
+      .col.s8.offset-s2
+        h3= title
+        ul#entries-container
+          each entry in entries
+            li [#{moment(entry.date).format('MM/DD hh:mm:ss A')}] #{entry.data}

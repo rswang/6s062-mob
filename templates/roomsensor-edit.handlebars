@@ -1,14 +1,22 @@
 <li id="sensor-{{sensorID}}" class="collection-item avatar roomsensor editing" data-sensor-id={{sensorID}}>
-    <i class="material-icons circle green">location_off</i>
+    {{#ifOccupied lastMotionTime}}
+        <i class="material-icons circle red">location_off</i>
+    {{else}}
+        <i class="material-icons circle green">location_on</i>
+    {{/ifOccupied}}
     <span class="title">{{sensorID}}</span>
     <p>
         <i>Last seen {{relativeDate lastMotionTime}}</i>
         <br/>
+        {{#if tempearture}}
         <b>Temperature:</b> {{temperature}}°F
         <br/>
+        {{/if}}
+        {{#if humidity}}
         <b>Humidity:</b> {{humidity}}%
         <br/>
-        <b>Notes:</b>
+        {{/if}}
+        <b>Description:</b>
     </p>
     <a class="secondary-content">
       <i class="material-icons roomsensor-cancel">cancel</i>

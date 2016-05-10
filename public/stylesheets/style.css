@@ -2,6 +2,12 @@ body {
   font: 14px "Roboto", Arial, sans-serif;
 }
 
+nav, .title, h1,h2,h3,h4,h5,h6 {
+    font-family: "Fjalla One";
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 a {
   color: #00B7FF;
 }
@@ -13,4 +19,15 @@ a {
 .notes {
     padding-left: 20px;
     font-family: "Courier";
+}
+
+i {
+    cursor: pointer;
+}
+
+.container, #calendar {
+    margin-top: 20px;
+}
+.brand-logo {
+    margin-left: 20px;
 }

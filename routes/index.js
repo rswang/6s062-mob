@@ -46,30 +46,30 @@ router.get('/readings', function(req, res) {
     if (err) {
       res.status(500).send(err);
     }
-    res.render('readings', {title: '6.S062 Sensor Readings', sensorValues: sensorValues});
+    res.render('readings', {title: 'Sensor Readings', sensorValues: sensorValues});
   })
 })
 
 router.get('/logs', function(req, res) {
   Entry.aggregate([
     {$sort: {date: -1}},
-    {$limit: 20},
+    {$limit: 100},
     {$sort: {date: 1}}
   ]).exec(function(err, entries) {
     if (err) {
       res.status(500).send(err);
     }
-    res.render('logs', {title: '6.S062 Sensor Logs', entries: entries});
+    res.render('logs', {title: 'Sensor Logs', entries: entries});
   })
 })
 
-router.get('/calendars', function(req, res) {
+router.get('/calendar', function(req, res) {
   RoomSensor.getEvents(function(err, events) {
     if (err) {
       res.status(500).send(err);
     }
-    res.render('calendars', {title: '6.S062 Sensor Logs', events: events});
-  })
+    res.render('calendar', {events: events});
+  });
 });
 
 router.get('/:sensorID', function(req, res) {
@@ -78,8 +78,18 @@ router.get('/:sensorID', function(req, res) {
     if (err) {
       res.status(500).send(err);
     }
-    res.render('graph', {title: '6.S062 Sensor Logs', readings: sensorValues});
+    res.render('graph', {readings: sensorValues});
   })
+})
+
+
+router.get('/:sensorID/calendar', function(req, res) {
+  RoomSensor.getEventsById(req.params.sensorID, function(err, events) {
+    if (err) {
+      res.status(500).send(err);
+    }
+    res.render('calendar', {events: events});
+  });
 })
 
 

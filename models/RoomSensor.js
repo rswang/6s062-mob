@@ -165,51 +165,70 @@ RoomSensorSchema.statics.updateStatus = function(sensor, data, entry, callback) 
   });
 };
 
+var getSensorEvents = function(sensor, done) {
+  var inactivityThreshold = 10;
+  
+  SensorValue.find({sensorID: sensor.sensorID, type: 'M'}).sort({date: 1}).exec(function(err, sensorValues) {
+    if (err) {
+      done(err);
+      return;
+    }
+    console.log(sensorValues);
+    var events = [];
+    var i = 0;
+    var startDate = null;
+    var endDate = null;
+    var motion = false;
+    while (i < sensorValues.length) {
+      sensorValue = sensorValues[i];
+      if (sensorValue.value == 0) {
+        if (motion && moment(sensorValue.date).isAfter(moment(endDate).add('minutes', inactivityThreshold))) {
+          motion = false;
+          if (startDate != endDate) {
+            events.push({
+              startDate: startDate,
+              endDate: endDate,
+              sensorID: sensor.sensorID,
+              type: 'M',
+            });
+          }
+          
+        }
+      } else if (sensorValues[i].value == 1) {
+        if (!motion) {
+          motion = true;
+          startDate = sensorValue.date;
+        }
+        endDate = sensorValue.date
+      }
+      i++;
+
+    }
+    done(err, events);
+  });
+}
+
 RoomSensorSchema.statics.getEvents = function(callback) {
   var that = this;
-
   that.find({}, function(err, sensors) {
-    async.map(sensors, function(sensor, done) {
-      SensorValue.find({sensorID: sensor.sensorID, type: 'M'}).sort({date: 1}).exec(function(err, sensorValues) {
-        if (err) {
-          done(err);
-          return;
-        }
-        console.log(sensorValues);
-        var events = [];
-        var i = 0;
-        var startDate = null;
-        var endDate = null;
-        var motion = false;
-        while (i < sensorValues.length) {
-          sensorValue = sensorValues[i];
-          if (sensorValue.value == 0) {
-            if (motion && moment(sensorValue.date).isAfter(moment(endDate).add('minutes', 5))) {
-              motion = false;
-              if (startDate != endDate) {
-                events.push({
-                  startDate: startDate,
-                  endDate: endDate,
-                  sensorID: sensor.sensorID,
-                  type: 'M',
-                });
-              }
-              
-            }
-          } else if (sensorValues[i].value == 1) {
-            if (!motion) {
-              motion = true;
-              startDate = sensorValue.date;
-            }
-            endDate = sensorValue.date
-          }
-          i++;
-
-        }
-        done(err, events);
-      })
-    }, callback)
+    async.map(sensors, getSensorEvents, callback);
   })
+}
+
+RoomSensorSchema.statics.getEventsById = function(sensorID, callback) {
+  var that = this;
+
+  var inactivityThreshold = 10;
+
+  that.findOne({sensorID: sensorID}, function(err, sensor) {
+    getSensorEvents(sensor, function(err, events) {
+      if (err) {
+        callback(err);
+        return;
+      }
+      callback(null, [events]);
+    });
+  });
 }
 
 

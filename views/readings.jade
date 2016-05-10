@@ -4,29 +4,48 @@ block head
 block content
   include ./nav.jade
   .container
-    h1= title
-    p Welcome to #{title}
-    ul.collection#readings-container
-      each sensorValue in sensorValues
-        li.collection-item.avatar
-          if sensorValue.type == "M"
-            i.material-icons.circle.orange check
-            span.title #{sensorValue.sensorID}
-            p
-              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
-              br
-              | Motion detected
-          else if sensorValue.type == "T"            
-            i.material-icons.circle.blue check
-            span.title #{sensorValue.sensorID}
-            p
-              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
-              br
-              | <b>Temperature:</b> #{sensorValue.value}°F
-          else if sensorValue.type == "H"
-            i.material-icons.circle.purple check
-            span.title #{sensorValue.sensorID}
-            p
-              | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
-              br
-              | <b>Humidity:</b> #{sensorValue.value}%
+    .row
+      .col.s8.offset-s2
+        h3= title
+        .input-field.col.s12
+          select
+            option(value="" selected) Select filter...
+            option(value="1") Option 1
+            option(value="2") Option 2
+            option(value="3") Option 3
+          label Select something...
+
+        ul.collection#readings-container
+
+          each sensorValue in sensorValues
+            li.collection-item.avatar
+              if sensorValue.type == "M"
+                i.material-icons.circle.orange
+                  if sensorValue.value == 0
+                    | location_off
+                  else
+                    | location_on
+                span.title #{sensorValue.sensorID}
+                p
+                  | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
+                  br
+                  if sensorValue.value == 0
+                    | No motion 
+                  else
+                    | Motion detected 
+              else if sensorValue.type == "T"            
+                i.circle.blue
+                  i.fa.fa-sun-o
+                span.title #{sensorValue.sensorID}
+                p
+                  | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
+                  br
+                  | <b>Temperature:</b> #{sensorValue.value}°F
+              else if sensorValue.type == "H"
+                i.circle.purple
+                  i.fa.fa-tint
+                span.title #{sensorValue.sensorID}
+                p
+                  | <i>#{moment(sensorValue.date).tz('America/New_York').format('MM/DD h:mm:ss A')}</i>
+                  br
+                  | <b>Humidity:</b> #{sensorValue.value}%

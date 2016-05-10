@@ -1,21 +1,24 @@
 <li id="sensor-{{sensorID}}" class="collection-item avatar roomsensor" data-sensor-id={{sensorID}}>
-    {{!-- TODO: add location on/off depending on lastMotionTime --}}
-    <i class="material-icons circle green">location_off</i>
+    {{#ifOccupied lastSeen}}
+        <i class="material-icons circle red">location_off</i>
+    {{else}}
+        <i class="material-icons circle green">location_on</i>
+    {{/ifOccupied}}
     <span class="title">{{sensorID}}</span>
     <p>
         <i>Last seen {{relativeDate lastSeen}}</i>
         <br/>
         <b>Status:</b> Person sensed {{relativeDate lastMotionTime}}
         <br/>
+        {{#if tempearture}}
         <b>Temperature:</b> {{temperature}}°F
         <br/>
+        {{/if}}
+        {{#if humidity}}
         <b>Humidity:</b> {{humidity}}%
         <br/>
-        <b>Notes:</b>
-        <br/>
-        <div class="notes">
-            {{notes}}
-        </div>
+        {{/if}}
+        <b>Description:</b> {{notes}}
     </p>
     <div class="secondary-content"> 
       <a class="roomsensor-edit">
@@ -23,6 +26,9 @@
       </a>
       <a class="roomsensor-graphs" href="/{{sensorID}}">
         <i class="material-icons">insert_chart</i>
+      </a>
+        <a class="roomsensor-calendar" href="/{{sensorID}}/calendar">
+        <i class="material-icons">today</i>
       </a>
     </div>
 </li>
